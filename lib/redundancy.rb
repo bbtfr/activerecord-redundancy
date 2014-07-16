@@ -27,13 +27,13 @@ module Redundancy
       return if klass.method_defined? callback_name
 
       klass.class_eval do
-        def redundancy_cache_column_after_save
+        define_method callback_name do
           self.class.cache_columns_on_foreign_key.each do |foreign_key, cache_columns|
-            return unless self.send :attribute_changed?, foreign_key
+            next unless self.send :attribute_changed?, foreign_key
 
             cache_columns.each do |cache_column|
               association = self.send(cache_column.association)
-              attribute = association.send(cache_column.attribute)
+              attribute = association && association.send(cache_column.attribute)
               write_attribute(cache_column.cache_column, attribute)
             end
           end
@@ -50,9 +50,9 @@ module Redundancy
       return if klass.method_defined? callback_name
 
       klass.class_eval do
-        def redundancy_update_remote_cache_column_after_update
+        define_method callback_name do
           self.class.cache_columns_on_attribute.each do |attribute, cache_columns|
-            return unless self.send :attribute_changed?, attribute
+            next unless self.send :attribute_changed?, attribute
 
             cache_columns.each do |cache_column|
               association = self.send(cache_column.inverse_association)
