@@ -3,7 +3,11 @@
 one:
   id: 1
   name: Name 1
+  account_id: 1
+  account_email: one@one.com
 
 two:
   id: 2
   name: Name 2
+  account_id: 2
+  account_email: two@two.com

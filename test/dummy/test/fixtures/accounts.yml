@@ -2,16 +2,10 @@
 
 one:
   id: 1
-  title: Title 1
-  content: Text 1
-  user_id: 1
+  email: one@one.com
   user_name: Name 1
-  username: Name 1
 
 two:
   id: 2
-  title: Title 2
-  content: Text 2
-  user_id: 2
+  email: two@two.com
   user_name: Name 2
-  username: Name 2

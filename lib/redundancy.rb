@@ -2,71 +2,71 @@ module Redundancy
   extend ActiveSupport::Concern
 
   class CacheColumn
-    class << self
-      alias_method :create, :new
+    attr_reader :options
+    attr_reader :source, :dist, :klass
+    attr_reader :change_if, :nil_unless, :update, :set_prev_nil
+
+    def initialize options
+      @options = options
+      @source, @dist = options[:source], options[:dist]
+      @klass = options[:klass]
+
+      @change_if = options[:change_if]
+      @nil_unless = options[:nil_unless]
+      @update = options[:update] || false
+      @set_prev_nil = options[:set_prev_nil]
     end
 
-    attr_reader :reflection, :options
-    attr_reader :attribute, :association, :inverse_association, :cache_column
+    def update_record record
+      raise ArgumentError, "record class mismatch, expected #{klass}, got #{record.class}" unless record.kind_of? klass
+      return unless need_update?(record)
+      
+      src = source[:association] ? record.send(source[:association]) : record
+      src = src && source[:attribute] && src.send(source[:attribute])
+      src = nil if nil_unless && !record.send(nil_unless) 
 
-    def initialize reflection, attribute, options
-      @reflection, @attribute, @options = reflection, attribute, options
-      @association = reflection.name
-      @inverse_association = options[:inverse_of]
-      @cache_column = options[:cache_column] || :"#{association}_#{attribute}"
+      dst = dist[:association] ? record.send(dist[:association]) : record
 
-      add_cache_column_local_callbacks
-      add_cache_column_remote_callbacks
-    end
+      set_prev_nil.where(id: record.send(:attribute_was, change_if))
+        .update_all(dist[:attribute] => nil) if set_prev_nil
 
-    private
-
-    def add_cache_column_local_callbacks
-      callback_name = :redundancy_cache_column_after_save
-      klass = reflection.active_record
-      return if klass.method_defined? callback_name
-
-      klass.class_eval do
-        define_method callback_name do
-          self.class.cache_columns_on_foreign_key.each do |foreign_key, cache_columns|
-            next unless self.send :attribute_changed?, foreign_key
-
-            cache_columns.each do |cache_column|
-              association = self.send(cache_column.association)
-              attribute = association && association.send(cache_column.attribute)
-              write_attribute(cache_column.cache_column, attribute)
-            end
-          end
+      case dst
+      when ActiveRecord::Base
+        return if dst.send(:read_attribute, dist[:attribute]) == src
+        log "#{ update ? "update" : "write" } #{dst.class}(#{dst.id})##{dist[:attribute]} with #{src.inspect}"
+        log "#{change_if}: #{record.send(change_if).inspect}, #{dist[:association]||"self"}.id: #{dst.id}"
+        if update
+          dst.send(:update_attribute, dist[:attribute], src)
+        else
+          dst.send(:write_attribute, dist[:attribute], src)
         end
-        
-        before_save callback_name
+      when ActiveRecord::Relation
+        log "update #{dst.class}##{dist[:attribute]} with #{src.inspect}"
+        dst.send(:update_all, dist[:attribute] => src)
       end
 
     end
 
-    def add_cache_column_remote_callbacks
-      callback_name = :redundancy_update_remote_cache_column_after_update
-      klass = reflection.klass
-      return if klass.method_defined? callback_name
-
-      klass.class_eval do
-        define_method callback_name do
-          self.class.cache_columns_on_attribute.each do |attribute, cache_columns|
-            next unless self.send :attribute_changed?, attribute
-
-            cache_columns.each do |cache_column|
-              association = self.send(cache_column.inverse_association)
-              association.update_all(cache_column.cache_column => self.send(attribute))
-            end
-          end
-        end
-        
-        before_save callback_name
-      end
-
+    def need_update? record
+      record.send(:attribute_changed?, change_if)
     end
 
+    def log *message
+      # puts *message
+    end
 
+  end
+
+  included do
+    before_save :redundancy_update_cache_column_after_save
+  end
+
+  private
+
+  def redundancy_update_cache_column_after_save
+    self.class.cache_columns.each do |cache_column|
+      cache_column.update_record(self)
+    end
   end
 
   module ClassMethods
@@ -86,17 +86,40 @@ module Redundancy
       end
 
       raise ArgumentError, "Could not find the inverse association for #{association} (#{inverse_associations.inspect} in #{reflection.klass})" unless inverse_association
-      options[:inverse_of] = inverse_association
+      
+      foreign_key = reflection.foreign_key
+      cache_column = options[:cache_column] || :"#{association}_#{attribute}"
 
-      cache_column = CacheColumn.create(reflection, attribute, options)
-      cache_columns << cache_column
+      local_klass = self
+      remote_klass = reflection.klass
 
-      cache_columns_on_foreign_key[reflection.foreign_key] ||= []
-      cache_columns_on_foreign_key[reflection.foreign_key] << cache_column
+      case reflection.macro
+      when :belongs_to
+        local_klass.cache_columns << CacheColumn.new({
+          source: { association: association, attribute: attribute },
+          dist: { association: nil, attribute: cache_column },
+          change_if: foreign_key, klass: local_klass
+        })
+        remote_klass.cache_columns << CacheColumn.new({
+          source: { association: nil, attribute: attribute },
+          dist: { association: inverse_association, attribute: cache_column },
+          change_if: attribute, klass: remote_klass, update: true
+        })
 
-      cache_columns_on_attribute = reflection.klass.cache_columns_on_attribute
-      cache_columns_on_attribute[attribute] ||= []
-      cache_columns_on_attribute[attribute] << cache_column
+      when :has_one
+        remote_klass.cache_columns << CacheColumn.new({
+          source: { association: nil, attribute: attribute },
+          dist: { association: inverse_association, attribute: cache_column },
+          change_if: foreign_key, nil_unless: foreign_key, klass: remote_klass,
+          set_prev_nil: local_klass
+        })
+        remote_klass.cache_columns << CacheColumn.new({
+          source: { association: nil, attribute: attribute },
+          dist: { association: inverse_association, attribute: cache_column },
+          change_if: attribute, klass: remote_klass, update: true
+        })
+      end
+
 
     end
 
@@ -104,16 +127,7 @@ module Redundancy
       @cache_columns ||= []
     end
 
-    def cache_columns_on_foreign_key
-      @cache_columns_on_foreign_key ||= {}
-    end
-    
-    def cache_columns_on_attribute
-      @cache_columns_on_attribute ||= {}
-    end
-
   end
-
 
 end
 
