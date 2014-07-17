@@ -63,8 +63,8 @@ redundancy association, attribute, options
 
 available options:
 
-1. __cache_column__ - Specify the column used to store the cached attribute, by default this is :"#{association}_#{attribute}", e.g.: user.name will cached in post.user_name
-2. __inverse_of__ - Specifies the name of the associated object that is the inverse of this association, by default this is singular or plural of the current model name, e.g.: :post or :posts.
+1. __cache_column__ - Specify the column used to store the cached attribute, by default this is `:"#{association}_#{attribute}"`, e.g.: `user.name` will cached in `post.user_name`
+2. __inverse_of__ - Specifies the name of the associated object that is the inverse of this association, by default this is singular or plural of the current model name, e.g.: `:post` or `:posts`.
 
 Installation
 ------------
