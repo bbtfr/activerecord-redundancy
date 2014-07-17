@@ -9,9 +9,9 @@ Gem::Specification.new do |s|
   s.version     = Redundancy::VERSION
   s.authors     = ["Theo"]
   s.email       = ["bbtfrr@gmail.com"]
-  s.summary     = "Wrap your objects with a helper to easily list them"
-  s.description = "Wrap your objects with a helper to easily list them"
-  s.homepage    = "https://bbtfr.github.io/activerecord-redundancy"
+  s.summary     = "Redundancy for better performance, non painful"
+  s.description = "Quickly make a cache column in ActiveRecord, non painful"
+  s.homepage    = "https://github.com/bbtfr/activerecord-redundancy"
   s.license     = "MIT"
 
   s.files       = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
