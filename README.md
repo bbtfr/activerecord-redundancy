@@ -1,6 +1,10 @@
 Redundancy
 ==========
 
+[![Gem Version](https://fury-badge.herokuapp.com/rb/activerecord-redundancy.png)](http://badge.fury.io/rb/activerecord-redundancy)
+[![Build Status](https://api.travis-ci.org/bbtfr/activerecord-redundancy.png?branch=master)](http://travis-ci.org/bbtfr/activerecord-redundancy)
+[![Code Climate](https://codeclimate.com/github/bbtfr/activerecord-redundancy.png)](https://codeclimate.com/github/bbtfr/activerecord-redundancy)
+
 Sometimes, for better performance, you may need database redundancy, which means you will store the same information in different tables. For example, you may want to save `username` into `posts` table, rather than just store `user_id` in it.
 
 Redundancy allows you to quickly make a cache column in ActiveRecord.
