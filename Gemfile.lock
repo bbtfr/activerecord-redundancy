@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    activerecord-redundancy (0.0.1)
+    activerecord-redundancy (0.1.0)
       activerecord (>= 3.2, < 5)
 
 GEM
