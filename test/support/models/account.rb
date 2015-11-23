@@ -1,5 +1,5 @@
 class Account < ActiveRecord::Base
   has_one :user
-  
-  redundancy :user, :name
+
+  cache_column :user, :name
 end

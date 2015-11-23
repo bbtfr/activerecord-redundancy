@@ -7,6 +7,7 @@ one:
   user_id: 1
   user_name: Name 1
   username: Name 1
+  star: 3
 
 two:
   id: 2
@@ -15,3 +16,4 @@ two:
   user_id: 2
   user_name: Name 2
   username: Name 2
+  star: 5

@@ -22,6 +22,7 @@ ActiveRecord::Schema.define do
     t.integer  "user_id"
     t.string   "user_name"
     t.string   "username"
+    t.integer  "star"
     t.string   "title"
     t.text     "content"
     t.datetime "created_at"
@@ -33,6 +34,8 @@ ActiveRecord::Schema.define do
   create_table "users", force: true do |t|
     t.integer  "account_id"
     t.string   "account_email"
+    t.integer  "posts_count"
+    t.integer  "posts_star"
     t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"

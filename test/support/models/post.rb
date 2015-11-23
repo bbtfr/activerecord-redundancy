@@ -1,6 +1,9 @@
 class Post < ActiveRecord::Base
   belongs_to :user
 
-  redundancy :user, :name
-  redundancy :user, :name, cache_column: :username
+  cache_column :user, :name
+  cache_column :user, :name, cache_column: :username
+
+  cache_method :user, :posts_count
+  cache_method :user, :posts_star
 end

@@ -5,9 +5,11 @@ one:
   name: Name 1
   account_id: 1
   account_email: one@one.com
+  posts_star: 3
 
 two:
   id: 2
   name: Name 2
   account_id: 2
   account_email: two@two.com
+  posts_star: 5

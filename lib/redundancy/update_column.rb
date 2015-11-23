@@ -1,9 +1,9 @@
 module Redundancy
 
-  class CacheColumn
+  class UpdateColumn
     attr_reader :options
     attr_reader :source, :dist, :klass
-    attr_reader :change_if, :nil_unless, :update, :set_prev_nil
+    attr_reader :change_if, :update
 
     def initialize options
       @options = options
@@ -11,23 +11,19 @@ module Redundancy
       @klass = options[:klass]
 
       @change_if = options[:change_if]
-      @nil_unless = options[:nil_unless]
       @update = options[:update] || false
-      @set_prev_nil = options[:set_prev_nil]
     end
 
-    def update_record record
+    def before_save record
       raise ArgumentError, "record class mismatch, expected #{klass}, got #{record.class}" unless record.kind_of? klass
       return unless need_update?(record)
-      
-      src = source[:association] ? record.send(source[:association]) : record
-      src = src && source[:attribute] && src.send(source[:attribute])
-      src = nil if nil_unless && !record.send(nil_unless) 
+      return if dist[:id_was] && (id_was = record.send(:attribute_was, dist[:id_was])).nil?
 
       dst = dist[:association] ? record.send(dist[:association]) : record
 
-      set_prev_nil[:klass].where(id: record.send(:attribute_was, set_prev_nil[:attribute]))
-        .update_all(dist[:attribute] => nil) if set_prev_nil
+      src = source[:association] ? record.send(source[:association]) : record
+      src = src && source[:attribute] && src.send(source[:attribute])
+      src = nil if source[:nil_unless] && !record.send(source[:nil_unless])
 
       case dst
       when ActiveRecord::Base
@@ -43,7 +39,9 @@ module Redundancy
         log "update #{dst.class}##{dist[:attribute]} with #{src.inspect}"
         dst.send(:update_all, dist[:attribute] => src)
       end
+    end
 
+    def after_save record
     end
 
     def need_update? record

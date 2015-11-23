@@ -20,3 +20,5 @@ ActiveSupport::TestCase.fixture_path = File.expand_path("../fixtures", __FILE__)
 class ActiveSupport::TestCase
   fixtures :all
 end
+
+ActiveSupport.test_order = :sorted
