@@ -13,7 +13,6 @@ module Redundancy
     end
 
     def after_save record
-      return unless need_update? record
       return unless target
 
       get_value_from_target record

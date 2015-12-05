@@ -3,7 +3,8 @@ module Redundancy
   class UpdateBase
     attr_reader :options
     attr_reader :source, :dest, :klass
-    attr_reader :change_if, :update, :target, :value
+    attr_reader :change_if, :update, :force
+    attr_reader :target, :value
 
     def initialize options
       @options = options
@@ -12,6 +13,13 @@ module Redundancy
 
       @change_if = options[:change_if]
       @update = options[:update] || false
+    end
+
+    def force_update! record
+      @force = true
+      @update = true
+      before_save record
+      after_save record
     end
 
     def before_save record
@@ -76,11 +84,12 @@ module Redundancy
     end
 
     def need_update? record
-      !change_if || record.send(:attribute_changed?, change_if)
+      @force || !change_if || record.send(:attribute_changed?, change_if)
     end
 
-    def log *message
-      # puts *message
+    # require 'colorize'
+    def log message
+      # puts "  Redundancy  ".colorize(:green) + message
     end
 
   end

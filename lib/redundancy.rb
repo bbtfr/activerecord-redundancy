@@ -24,8 +24,7 @@ module Redundancy
 
   def update_redundacies
     self.class.redundacies.each do |redundancy|
-      redundancy.before_save(self)
-      redundancy.after_save(self)
+      redundancy.force_update!(self)
     end
   end
 
@@ -42,6 +41,14 @@ module Redundancy
 
     def redundacies
       @redundacies ||= []
+    end
+
+    def update_redundacies
+      all.each do |record|
+        redundacies.each do |redundancy|
+          redundancy.force_update!(record)
+        end
+      end
     end
 
   end
