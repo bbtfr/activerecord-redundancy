@@ -57,14 +57,26 @@ Here Redundancy do 2 things for you:
 Usage
 -----
 
+### CacheColumn
+
 ```ruby
-redundancy association, attribute, options
+cache_column association, attribute, options
 ```
 
 available options:
 
 1. __cache_column__ - Specify the column used to store the cached attribute, by default this is `:"#{association}_#{attribute}"`, e.g.: `user.name` will cached in `post.user_name`
 2. __inverse_of__ - Specifies the name of the associated object that is the inverse of this association, by default this is singular or plural of the current model name, e.g.: `:post` or `:posts`.
+
+### CacheMethod
+
+```ruby
+cache_method association, attribute, options
+```
+
+available options:
+
+1. __cache_method__ - Specify the method need to be cached, by default this is `:"raw_#{attribute}"`, e.g.: `user.raw_orders_count` will cached in `post.orders_count`
 
 Installation
 ------------

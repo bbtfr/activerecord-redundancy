@@ -21,6 +21,7 @@ class HasOneBelongsToAssociationTest < ActiveSupport::TestCase
 
     user.update_attribute(:account, account)
     assert_equal account.email, user.account_email
+    assert_equal account.email, user.reload.account_email
   end
 
   test "should update user.account_email when update user.account with nil" do
@@ -30,6 +31,7 @@ class HasOneBelongsToAssociationTest < ActiveSupport::TestCase
 
     user.update_attribute(:account, nil)
     assert_equal nil, user.account_email
+    assert_equal nil, user.reload.account_email
   end
 
   test "should update user.account_email when update user.account with other account" do
@@ -42,8 +44,10 @@ class HasOneBelongsToAssociationTest < ActiveSupport::TestCase
 
     user.update_attribute(:account, other_account)
     assert_equal other_account.email, user.account_email
+    assert_equal other_account.email, user.reload.account_email
     assert_equal other_account, other_user.account
     assert_equal other_account.email, other_user.account_email
+    assert_equal other_account.email, other_user.reload.account_email
   end
 
   test "should update user.account_email when update account.email" do

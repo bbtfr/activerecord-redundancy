@@ -21,6 +21,7 @@ class BelongsToHasOneAssociationTest < ActiveSupport::TestCase
 
     account.update_attribute(:user, user)
     assert_equal user.name, account.user_name
+    assert_equal user.name, account.reload.user_name
   end
 
   test "should update account.user_name when update account.user with nil" do
@@ -30,6 +31,7 @@ class BelongsToHasOneAssociationTest < ActiveSupport::TestCase
 
     account.update_attribute(:user, nil)
     assert_equal nil, account.user_name
+    assert_equal nil, account.reload.user_name
   end
 
   test "should update account.user_name when update account.user with other user" do
@@ -42,7 +44,8 @@ class BelongsToHasOneAssociationTest < ActiveSupport::TestCase
 
     account.update_attribute(:user, other_user)
     assert_equal other_user.name, account.user_name
-    assert_equal nil, other_account.reload.user
+    assert_equal other_user.name, account.reload.user_name
+    assert_equal nil, other_account.user
     assert_equal nil, other_account.reload.user_name
   end
 
@@ -53,7 +56,6 @@ class BelongsToHasOneAssociationTest < ActiveSupport::TestCase
 
     user.update_attribute(:name, "Other Name")
     assert_equal user.name, user.account.user_name
-
     assert_equal user.name, account.reload.user_name
   end
 

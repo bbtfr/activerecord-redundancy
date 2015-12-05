@@ -22,6 +22,13 @@ module Redundancy
     end
   end
 
+  def update_redundacies
+    self.class.redundacies.each do |redundancy|
+      redundancy.before_save(self)
+      redundancy.after_save(self)
+    end
+  end
+
   module ClassMethods
     def cache_column association, attribute, options = {}
       options.assert_valid_keys(:cache_column, :inverse_of)
