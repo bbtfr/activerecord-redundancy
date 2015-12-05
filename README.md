@@ -39,12 +39,17 @@ end
 
 class User < ActiveRecord::Base
   has_many :posts
+
+  def raw_posts_count
+    posts.count
+  end
 end
 
 class Post < ActiveRecord::Base
   belongs_to :user
 
-  redundancy :user, :name
+  cache_column :user, :name
+  cache_method :user, :posts_count
 end
 ```
 
