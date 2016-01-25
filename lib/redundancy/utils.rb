@@ -92,7 +92,7 @@ module Redundancy
         reflection_klass.reflect_on_association(inverse_association)
       end
 
-      raise ArgumentError, "Could not find the inverse association for #{association} (#{inverse_associations.inspect} in #{reflection_klass})" unless inverse_association
+      raise ArgumentError, "Could not find the inverse association for #{model_name} (#{inverse_associations.inspect} in #{reflection_klass})" unless inverse_association
       inverse_association
     end
 
