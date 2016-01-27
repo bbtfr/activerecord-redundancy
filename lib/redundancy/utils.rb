@@ -23,20 +23,20 @@ module Redundancy
 
       case reflection.macro
       when :belongs_to
-        local_klass.redundacies << UpdateColumn.new(
+        local_klass.redundancies << UpdateColumn.new(
           source: { association: association, attribute: attribute },
           dest: { association: nil, attribute: cache_column },
           change_if: foreign_key, klass: local_klass
         )
 
       when :has_one
-        remote_klass.redundacies << UpdateColumn.new(
+        remote_klass.redundancies << UpdateColumn.new(
           source: { association: nil, attribute: attribute, nil_unless: foreign_key },
           dest: { association: inverse_association, attribute: cache_column },
           change_if: foreign_key, klass: remote_klass
         )
 
-        remote_klass.redundacies << UpdatePrevColumn.new(
+        remote_klass.redundancies << UpdatePrevColumn.new(
           source: options[:default],
           dest: { klass: local_klass, prev_id: foreign_key, attribute: cache_column },
           change_if: foreign_key, klass: remote_klass
@@ -44,7 +44,7 @@ module Redundancy
 
       end
 
-      remote_klass.redundacies << UpdateColumn.new(
+      remote_klass.redundancies << UpdateColumn.new(
         source: { association: nil, attribute: attribute },
         dest: { association: inverse_association, attribute: cache_column },
         change_if: attribute, klass: remote_klass, update: true
@@ -63,13 +63,13 @@ module Redundancy
 
       cache_method = options[:cache_method] || :"raw_#{attribute}"
 
-      local_klass.redundacies << UpdateMethod.new(
+      local_klass.redundancies << UpdateMethod.new(
         source: { attribute: cache_method },
         dest: { association: association, attribute: attribute },
         change_if: options[:change_if], klass: local_klass
       )
 
-      local_klass.redundacies << UpdatePrevMethod.new(
+      local_klass.redundancies << UpdatePrevMethod.new(
         source: { attribute: cache_method },
         dest: { klass: remote_klass, prev_id: foreign_key, attribute: attribute },
         change_if: foreign_key, klass: local_klass
