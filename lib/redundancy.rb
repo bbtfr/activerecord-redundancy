@@ -3,6 +3,12 @@ require 'redundancy/utils'
 module Redundancy
   extend ActiveSupport::Concern
 
+  def self.update_redundancies
+    ActiveRecord::Base.subclasses.each do |klass|
+      klass.try :update_redundancies
+    end
+  end
+
   included do
     before_save :update_redundancies_before_save
     after_save :update_redundancies_after_save
