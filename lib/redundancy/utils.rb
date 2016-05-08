@@ -1,7 +1,6 @@
 require 'redundancy/update_column'
-require 'redundancy/update_prev_column'
-require 'redundancy/update_method'
-require 'redundancy/update_prev_method'
+require 'redundancy/update_column_with_prev'
+require 'redundancy/update_method_with_prev'
 
 module Redundancy
 
@@ -61,15 +60,9 @@ module Redundancy
           )
 
         else
-          remote_klass.redundancies << UpdateColumn.new(
-            source: { association: nil, attribute: attribute, nil_unless: foreign_key },
-            dest: { association: inverse_association, attribute: cache_column },
-            change_if: foreign_key, klass: remote_klass
-          )
-
-          remote_klass.redundancies << UpdatePrevColumn.new(
-            source: options[:default],
-            dest: { klass: local_klass, prev_id: foreign_key, attribute: cache_column },
+          remote_klass.redundancies << UpdateColumnWithPrev.new(
+            source: { association: nil, attribute: attribute, nil_unless: foreign_key, default: options[:default] },
+            dest: { klass: local_klass, foreign_key: foreign_key, association: inverse_association, attribute: cache_column },
             change_if: foreign_key, klass: remote_klass
           )
 
@@ -96,16 +89,10 @@ module Redundancy
 
       cache_method = options[:cache_method] || :"raw_#{attribute}"
 
-      local_klass.redundancies << UpdateMethod.new(
+      local_klass.redundancies << UpdateMethodWithPrev.new(
         source: { attribute: cache_method },
-        dest: { association: association, attribute: attribute },
-        change_if: options[:change_if], klass: local_klass
-      )
-
-      local_klass.redundancies << UpdatePrevMethod.new(
-        source: { attribute: cache_method },
-        dest: { klass: remote_klass, prev_id: foreign_key, attribute: attribute },
-        change_if: foreign_key, klass: local_klass
+        dest: { klass: remote_klass, foreign_key: foreign_key, association: association, attribute: attribute },
+        change_if: nil, klass: local_klass
       )
 
     end

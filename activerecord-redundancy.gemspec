@@ -21,7 +21,11 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "sqlite3"
   s.add_development_dependency "pry"
-  s.add_development_dependency "pry-byebug"
+  if RUBY_VERSION > "2.0"
+    s.add_development_dependency "pry-byebug"
+  else
+    s.add_development_dependency "pry-debugger"
+  end
   s.add_development_dependency "pry-rescue"
   s.add_development_dependency "pry-stack_explorer"
   s.add_development_dependency "rails"
