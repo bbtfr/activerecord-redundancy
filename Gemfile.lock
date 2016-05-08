@@ -46,7 +46,9 @@ GEM
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
     builder (3.2.2)
+    byebug (8.2.5)
     coderay (1.1.0)
+    colorize (0.7.7)
     debug_inspector (0.0.2)
     erubis (2.7.0)
     globalid (0.3.6)
@@ -68,6 +70,9 @@ GEM
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
       slop (~> 3.4)
+    pry-byebug (3.3.0)
+      byebug (~> 8.0)
+      pry (~> 0.10)
     pry-rescue (1.4.2)
       interception (>= 0.5)
       pry
@@ -120,10 +125,13 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord-redundancy!
+  colorize
+  pry
+  pry-byebug
   pry-rescue
   pry-stack_explorer
   rails
   sqlite3
 
 BUNDLED WITH
-   1.10.6
+   1.11.2

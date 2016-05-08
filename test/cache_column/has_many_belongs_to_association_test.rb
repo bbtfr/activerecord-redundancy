@@ -54,7 +54,7 @@ class HasManyBelongsToAssociationTest < ActiveSupport::TestCase
     assert_equal user.name, post.user_name
 
     user.update_attribute(:name, "Other Name")
-    user.posts.each do |post|
+    user.posts.reload.each do |post|
       assert_equal user.name, post.user_name
     end
     assert_equal user.name, post.reload.user_name

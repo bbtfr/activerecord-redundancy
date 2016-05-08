@@ -1,6 +1,7 @@
 class User < ActiveRecord::Base
-  has_many :posts
   belongs_to :account
+  has_one :session
+  has_many :posts
 
   cache_column :account, :email
 

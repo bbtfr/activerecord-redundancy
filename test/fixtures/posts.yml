@@ -7,6 +7,7 @@ one:
   user_id: 1
   user_name: Name 1
   username: Name 1
+  account_email: one@one.com
   star: 3
 
 two:
@@ -16,4 +17,5 @@ two:
   user_id: 2
   user_name: Name 2
   username: Name 2
+  account_email: two@two.com
   star: 5

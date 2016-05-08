@@ -12,6 +12,7 @@ module Redundancy
       get_value_from_association record
 
       update_target record
+      cleanup_context
     end
 
   end

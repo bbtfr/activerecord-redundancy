@@ -9,6 +9,12 @@ module Redundancy
     end
   end
 
+  def update_redundancies
+    self.class.redundancies.each do |redundancy|
+      redundancy.force_update!(self)
+    end
+  end
+
   included do
     before_save :update_redundancies_before_save
     after_save :update_redundancies_after_save
@@ -28,20 +34,14 @@ module Redundancy
     end
   end
 
-  def update_redundancies
-    self.class.redundancies.each do |redundancy|
-      redundancy.force_update!(self)
-    end
-  end
-
   module ClassMethods
     def cache_column association, attribute, options = {}
-      options.assert_valid_keys(:cache_column, :inverse_of)
+      options.assert_valid_keys(:cache_column, :default)
       Utils.cache_column self, association, attribute, options
     end
 
     def cache_method association, attribute, options = {}
-      options.assert_valid_keys(:cache_column, :inverse_of)
+      options.assert_valid_keys(:cache_method)
       Utils.cache_method self, association, attribute, options
     end
 

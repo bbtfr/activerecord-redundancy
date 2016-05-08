@@ -12,6 +12,7 @@ module Redundancy
       get_value_from_source record
 
       update_target record
+      cleanup_context
     end
 
   end
