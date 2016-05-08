@@ -121,6 +121,10 @@ module Redundancy
       force || !change_if || record.send(:attribute_changed?, change_if)
     end
 
+    def foreign_key_changed? record
+      record.send(:attribute_changed?, dest[:foreign_key])
+    end
+
     # require 'colorize'
     def log message
       # puts "  Redundancy  ".colorize(:green) + message
