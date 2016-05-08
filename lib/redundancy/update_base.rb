@@ -17,9 +17,6 @@ module Redundancy
 
     def force_update! record
       set_context :force, true
-      set_context :update, true
-      before_save record
-      after_save record
     end
 
     # ActiveRecord Hooks
@@ -33,12 +30,10 @@ module Redundancy
 
     # Context
     def set_context key, value
-      log "set #{key} to #{value.inspect}"
       @context[key] = value
     end
 
     def cleanup_context
-      log "===== cleanup context ====="
       @context = {}
     end
 
@@ -48,6 +43,10 @@ module Redundancy
 
     def force
       @context[:force]
+    end
+
+    def update_method
+      @context[:update_method] || (update ? :update_attribute : :write_attribute)
     end
 
     def context key
@@ -100,21 +99,12 @@ module Redundancy
       case target
       when ActiveRecord::Base
         return if target.send(:read_attribute, dest[:attribute]) == value
-        log "#{ update ? "update" : "write" } #{target.class}(#{target.id})##{dest[:attribute]} with #{value.inspect}"
-        if update
-          target.send(:update_attribute, dest[:attribute], value)
-        else
-          target.send(:write_attribute, dest[:attribute], value)
-        end
+        log "#{update_method} #{target.class}(#{target.id})##{dest[:attribute]} with #{value.inspect}"
+        target.send(update_method, dest[:attribute], value)
       when ActiveRecord::Relation
-        log "update #{target.class}##{dest[:attribute]} with #{value.inspect}"
+        log "update_all #{target.class}##{dest[:attribute]} with #{value.inspect}"
         target.send(:update_all, dest[:attribute] => value)
       end
-    end
-
-    def force_update_target record, key = :default
-      set_context :update, true
-      update_target record, key
     end
 
     def need_update? record

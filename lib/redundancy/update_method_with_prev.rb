@@ -14,15 +14,17 @@ module Redundancy
 
     def after_save record
       return unless need_update? record
+      set_context :update_method, :update_column
+
       get_target_from_association record
       get_value_from_target record
 
-      force_update_target record
+      update_target record
 
       return unless context(:"target_prev")
 
       get_value_from_target record, :prev
-      force_update_target record, :prev
+      update_target record, :prev
     ensure
       cleanup_context
     end

@@ -13,6 +13,7 @@ module Redundancy
     self.class.redundancies.each do |redundancy|
       redundancy.force_update!(self)
     end
+    save(validate: false)
   end
 
   included do
@@ -51,9 +52,7 @@ module Redundancy
 
     def update_redundancies
       all.each do |record|
-        redundancies.each do |redundancy|
-          redundancy.force_update!(record)
-        end
+        record.update_redundancies
       end
     end
 
