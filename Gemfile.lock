@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    activerecord-redundancy (0.3.3)
+    activerecord-redundancy (0.4.1)
       activerecord (>= 3.2, < 5)
 
 GEM
@@ -134,4 +134,4 @@ DEPENDENCIES
   sqlite3
 
 BUNDLED WITH
-   1.11.2
+   1.12.3
